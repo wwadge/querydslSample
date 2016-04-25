@@ -36,7 +36,8 @@ repositories {
 
 dependencies {
 	compile('org.springframework.boot:spring-boot-starter-data-jpa')
-	compile('com.mysema.querydsl:querydsl-apt:3.6.9')
+	compile('com.mysema.querydsl:querydsl-apt:3.6.9:jpa')
+    compile('com.mysema.querydsl:querydsl-jpa:3.6.9')
 	runtime('org.hsqldb:hsqldb')
 	testCompile('org.springframework.boot:spring-boot-starter-test') 
 }
