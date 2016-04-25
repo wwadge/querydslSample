@@ -1,0 +1,49 @@
+configurations {
+    querydslaptjpa
+    compile.extendsFrom querydslaptjpa
+}
+
+
+sourceSets {
+    main { compileClasspath = compileClasspath + configurations.provided } // to workaround gradle lacking a "provides" scope
+    generated {
+        java {
+            srcDirs = ['src/main/generated']   // define to be able to use from everywhere
+        }
+    }
+}
+
+
+sourceSets.generated.java.srcDirs = ['src/main/generated']
+
+task generateQueryDSL(type: JavaCompile, group: 'build', description: 'Generates the QueryDSL query types') {
+    source = sourceSets.main.java
+    classpath = configurations.compile + configurations.querydslaptjpa
+
+    options.compilerArgs = [
+            "-proc:only",
+            "-processor", "com.mysema.query.apt.jpa.JPAAnnotationProcessor"
+    ]
+    destinationDir = sourceSets.generated.java.srcDirs.iterator().next()
+}
+
+compileJava {
+    classpath = configurations.compile - configurations.querydslaptjpa
+    dependsOn generateQueryDSL
+    source generateQueryDSL.destinationDir
+}
+
+
+
+clean {
+    // when cleaning, also delete these generated files
+    delete sourceSets.generated.java.srcDirs
+}
+
+
+idea {
+    module {
+        sourceDirs += file('src/main/generated')
+        generatedSourceDirs += file('src/main/generated')
+    }
+}
